@@ -36,7 +36,6 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
       Debug.Log($"MinHandDetectionConfidence = {config.MinHandDetectionConfidence}");
       Debug.Log($"MinHandPresenceConfidence = {config.MinHandPresenceConfidence}");
       Debug.Log($"MinTrackingConfidence = {config.MinTrackingConfidence}");
-      // Debug.Log(result.handLandmarks.Count);
 
       yield return AssetLoader.PrepareAssetAsync(config.ModelPath);
 
