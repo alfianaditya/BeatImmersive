@@ -1,63 +1,80 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class NoteSpawner : MonoBehaviour
 {
+    [Header("Systems")]
+    [SerializeField] private HandTrackingManager handTrackingManager;
+    [SerializeField] private ScoreManager scoreManager;
+
     [Header("Prefab")]
-    public Note notePrefab;
+    [SerializeField] private Note notePrefab;
 
     [Header("Spawn Points")]
-    public Transform leftASpawn;
-    public Transform leftBSpawn;
-    public Transform rightASpawn;
-    public Transform rightBSpawn;
+    [SerializeField] private Transform leftASpawn;
+    [SerializeField] private Transform leftBSpawn;
+    [SerializeField] private Transform rightASpawn;
+    [SerializeField] private Transform rightBSpawn;
 
-    [Header("Hit Points")]
-    public Transform leftAHit;
-    public Transform leftBHit;
-    public Transform rightAHit;
-    public Transform rightBHit;
+    [Header("Forward Targets")]
+    [FormerlySerializedAs("leftAHit")]
+    [SerializeField] private Transform leftAForwardTarget;
+
+    [FormerlySerializedAs("leftBHit")]
+    [SerializeField] private Transform leftBForwardTarget;
+
+    [FormerlySerializedAs("rightAHit")]
+    [SerializeField] private Transform rightAForwardTarget;
+
+    [FormerlySerializedAs("rightBHit")]
+    [SerializeField] private Transform rightBForwardTarget;
 
     [Header("Spawn Settings")]
-    public float spawnInterval = 0.8f;
+    [SerializeField] private float spawnInterval = 0.8f;
 
-    [Range(0, 1)]
-    public float doubleChance = 0.3f;
+    [Range(0f, 1f)]
+    [SerializeField] private float doubleChance = 0.3f;
 
-    [Range(0, 1)]
-    public float crossChance = 0.15f;
+    [Range(0f, 1f)]
+    [SerializeField] private float crossChance = 0.15f;
 
-    float timer;
+    private float timer;
+
+    private void Start()
+    {
+        ValidateReferences();
+    }
 
     private void Update()
     {
         timer += Time.deltaTime;
 
-        if (timer >= spawnInterval)
-        {
-            timer = 0;
+        if (timer < spawnInterval)
+            return;
 
-            if (Random.value < doubleChance)
-                SpawnDouble();
-            else
-                SpawnSingle();
-        }
+        timer = 0f;
+
+        if (Random.value < doubleChance)
+            SpawnDouble();
+        else
+            SpawnSingle();
     }
 
-    void SpawnSingle()
+    private void SpawnSingle()
     {
         LaneType lane = (LaneType)Random.Range(0, 4);
 
         HandType requiredHand =
             lane == LaneType.LeftA || lane == LaneType.LeftB
-            ? HandType.Left
-            : HandType.Right;
+                ? HandType.Left
+                : HandType.Right;
 
         if (Random.value < crossChance)
         {
             requiredHand =
                 requiredHand == HandType.Left
-                ? HandType.Right
-                : HandType.Left;
+                    ? HandType.Right
+                    : HandType.Left;
         }
 
         GestureType gesture =
@@ -66,12 +83,15 @@ public class NoteSpawner : MonoBehaviour
         Spawn(lane, requiredHand, gesture);
     }
 
-    void SpawnDouble()
+    private void SpawnDouble()
     {
         bool useA = Random.value < 0.5f;
 
-        LaneType leftLane = useA ? LaneType.LeftA : LaneType.LeftB;
-        LaneType rightLane = useA ? LaneType.RightA : LaneType.RightB;
+        LaneType leftLane =
+            useA ? LaneType.LeftA : LaneType.LeftB;
+
+        LaneType rightLane =
+            useA ? LaneType.RightA : LaneType.RightB;
 
         Spawn(
             leftLane,
@@ -84,49 +104,83 @@ public class NoteSpawner : MonoBehaviour
             (GestureType)Random.Range(0, 3));
     }
 
-    void Spawn(
+    private void Spawn(
         LaneType lane,
         HandType requiredHand,
         GestureType gesture)
     {
-        Transform spawn = null;
-        Transform hit = null;
+        GetLaneTransforms(
+            lane,
+            out Transform spawnPoint,
+            out Transform forwardTarget);
 
-        switch (lane)
+        if (notePrefab == null ||
+            spawnPoint == null ||
+            forwardTarget == null)
         {
-            case LaneType.LeftA:
-                spawn = leftASpawn;
-                hit = leftAHit;
-                break;
-
-            case LaneType.LeftB:
-                spawn = leftBSpawn;
-                hit = leftBHit;
-                break;
-
-            case LaneType.RightA:
-                spawn = rightASpawn;
-                hit = rightAHit;
-                break;
-
-            case LaneType.RightB:
-                spawn = rightBSpawn;
-                hit = rightBHit;
-                break;
+            Debug.LogError(
+                $"Gagal spawn note pada lane {lane}. Reference belum lengkap.");
+            return;
         }
 
         Note note = Instantiate(
             notePrefab,
-            spawn.position,
-            spawn.rotation,
-            spawn);
+            spawnPoint.position,
+            spawnPoint.rotation);
 
-        note.Init(hit);
+        note.Init(
+            forwardTarget,
+            handTrackingManager,
+            scoreManager);
 
         note.SetData(
             lane,
             requiredHand,
             gesture);
+    }
+
+    private void GetLaneTransforms(
+        LaneType lane,
+        out Transform spawnPoint,
+        out Transform forwardTarget)
+    {
+        spawnPoint = null;
+        forwardTarget = null;
+
+        switch (lane)
+        {
+            case LaneType.LeftA:
+                spawnPoint = leftASpawn;
+                forwardTarget = leftAForwardTarget;
+                break;
+
+            case LaneType.LeftB:
+                spawnPoint = leftBSpawn;
+                forwardTarget = leftBForwardTarget;
+                break;
+
+            case LaneType.RightA:
+                spawnPoint = rightASpawn;
+                forwardTarget = rightAForwardTarget;
+                break;
+
+            case LaneType.RightB:
+                spawnPoint = rightBSpawn;
+                forwardTarget = rightBForwardTarget;
+                break;
+        }
+    }
+
+    private void ValidateReferences()
+    {
+        if (handTrackingManager == null)
+            Debug.LogError("NoteSpawner: HandTrackingManager belum diisi.");
+
+        if (scoreManager == null)
+            Debug.LogError("NoteSpawner: ScoreManager belum diisi.");
+
+        if (notePrefab == null)
+            Debug.LogError("NoteSpawner: Note Prefab belum diisi.");
     }
 }
 
@@ -138,9 +192,10 @@ public enum HandType
 
 public enum GestureType
 {
-    Rock,
-    Paper,
-    Scissors
+    Rock = 0,
+    Paper = 1,
+    Scissors = 2,
+    Unknown = 3
 }
 
 public enum LaneType
