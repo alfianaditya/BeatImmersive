@@ -1,101 +1,67 @@
-using System;
 using UnityEngine;
 
-[DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(AudioSource))]
 public class RhythmMusicManager : MonoBehaviour
 {
-    [Header("Song")]
-    [SerializeField] private AudioClip song;
-    [SerializeField, Min(1f)] private float bpm = 156f;
+    [SerializeField] private AudioSource audioSource;
 
-    [Tooltip("Waktu dari awal audio sampai beat pertama, dalam detik.")]
-    [SerializeField, Min(0f)] private float firstBeatOffset;
+    public SongDataSO CurrentSong { get; private set; }
+    public float CurrentBPM { get; private set; } = 120f;
+    public bool IsPlaying => audioSource != null && audioSource.isPlaying;
 
-    [Tooltip("Waktu persiapan sebelum audio mulai.")]
-    [SerializeField, Min(0.1f)] private float startDelay = 3f;
-
-    [Header("Playback")]
-    [SerializeField] private bool playOnStart = true;
-
-    private AudioSource audioSource;
-
+    // Kompatibilitas dengan BeatmapSpawner lama.
     public bool IsScheduled { get; private set; }
-    public double SongStartDspTime { get; private set; }
-
-    public float BPM => bpm;
-    public float FirstBeatOffset => firstBeatOffset;
-    public float StartDelay => startDelay;
-    public float SecondsPerBeat => 60f / bpm;
-
-    public float SongLengthSeconds =>
-        song != null ? song.length : 0f;
-
-    public double SongPositionSeconds
-    {
-        get
-        {
-            if (!IsScheduled)
-                return -startDelay;
-
-            return AudioSettings.dspTime - SongStartDspTime;
-        }
-    }
-
+    public float SecondsPerBeat => 60f / Mathf.Max(1f, CurrentBPM);
     public double SongPositionBeats =>
-        (SongPositionSeconds - firstBeatOffset) / SecondsPerBeat;
-
-    public float RemainingTimeSeconds
-    {
-        get
-        {
-            double playedSeconds =
-                Math.Max(0d, SongPositionSeconds);
-
-            return Mathf.Max(
-                0f,
-                SongLengthSeconds - (float)playedSeconds);
-        }
-    }
-
-    public bool HasSongEnded =>
-        IsScheduled &&
-        SongPositionSeconds >= SongLengthSeconds;
+        audioSource != null ? audioSource.time / SecondsPerBeat : 0d;
+    public float FirstBeatOffset => 0f;
+    public float StartDelay => 0f;
 
     private void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
-        audioSource.playOnAwake = false;
-    }
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
 
-    private void Start()
-    {
-        if (playOnStart)
-            StartSong();
-    }
-
-    public void StartSong()
-    {
-        if (song == null)
+        if (audioSource != null)
         {
-            Debug.LogError(
-                "RhythmMusicManager: Song belum diisi.");
-            return;
+            audioSource.playOnAwake = false;
+            audioSource.loop = false;
+        }
+    }
+
+    public bool PlaySong(SongDataSO song)
+    {
+        if (audioSource == null)
+        {
+            Debug.LogError("RhythmMusicManager: AudioSource belum diisi.");
+            return false;
         }
 
-        audioSource.Stop();
-        audioSource.clip = song;
+        if (song == null || song.AudioClip == null)
+        {
+            Debug.LogError("RhythmMusicManager: Song atau AudioClip kosong.");
+            return false;
+        }
 
-        SongStartDspTime =
-            AudioSettings.dspTime + startDelay;
+        StopSong();
 
-        audioSource.PlayScheduled(SongStartDspTime);
+        CurrentSong = song;
+        CurrentBPM = song.BPM;
+        audioSource.clip = song.AudioClip;
+        audioSource.time = 0f;
+        audioSource.Play();
         IsScheduled = true;
+        return true;
     }
 
     public void StopSong()
     {
-        audioSource.Stop();
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            audioSource.time = 0f;
+        }
+
         IsScheduled = false;
     }
 }

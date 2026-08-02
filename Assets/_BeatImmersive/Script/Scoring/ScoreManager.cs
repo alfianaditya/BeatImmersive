@@ -3,15 +3,16 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    [Header("UI")]
+    [Header("Gameplay Text")]
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text missText;
 
-    [Header("3D Combo")]
+    [Header("Combo Effect")]
     [SerializeField] private ComboEffect comboEffect;
 
     [Header("Score Settings")]
-    [SerializeField, Min(0)] private int defaultHitScore = 100;
+    [SerializeField, Min(0)]
+    private int defaultHitScore = 1;
 
     public int Score { get; private set; }
     public int HitCount { get; private set; }
@@ -24,6 +25,13 @@ public class ScoreManager : MonoBehaviour
         ResetScore();
     }
 
+    // Dipanggil jika HIT tidak memberikan nilai khusus.
+    public void RegisterHit()
+    {
+        RegisterHit(defaultHitScore);
+    }
+
+    // Dipanggil saat note berhasil dipukul.
     public void RegisterHit(int value)
     {
         int addedScore =
@@ -36,25 +44,38 @@ public class ScoreManager : MonoBehaviour
         Combo++;
 
         if (Combo > MaxCombo)
+        {
             MaxCombo = Combo;
+        }
 
         if (comboEffect != null)
+        {
             comboEffect.ShowCombo(Combo);
+        }
+        else
+        {
+            Debug.LogError(
+                "ScoreManager: ComboEffect belum diisi.");
+        }
 
         RefreshUI();
     }
 
+    // Dipanggil saat note terlewat atau salah gesture.
     public void RegisterMiss()
     {
         MissCount++;
         Combo = 0;
 
         if (comboEffect != null)
+        {
             comboEffect.ResetCombo();
+        }
 
         RefreshUI();
     }
 
+    // Dipanggil saat mulai lagu, restart, atau memilih lagu baru.
     public void ResetScore()
     {
         Score = 0;
@@ -64,7 +85,9 @@ public class ScoreManager : MonoBehaviour
         MaxCombo = 0;
 
         if (comboEffect != null)
+        {
             comboEffect.ResetCombo();
+        }
 
         RefreshUI();
     }
@@ -72,9 +95,13 @@ public class ScoreManager : MonoBehaviour
     private void RefreshUI()
     {
         if (scoreText != null)
+        {
             scoreText.text = $"Score: {Score}";
+        }
 
         if (missText != null)
+        {
             missText.text = $"Miss: {MissCount}";
+        }
     }
 }

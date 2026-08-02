@@ -6,18 +6,32 @@ public class ComboEffect : MonoBehaviour
 {
     [Header("Text")]
     [SerializeField] private TMP_Text comboText;
-    [SerializeField] private string comboFormat = "{0}x COMBO";
+
+    [SerializeField]
+    private string comboFormat = "{0}x COMBO";
 
     [Header("Scale Animation")]
-    [SerializeField] private Vector3 startScale = Vector3.zero;
-    [SerializeField] private Vector3 punchScale = new Vector3(1.35f, 1.35f, 1.35f);
-    [SerializeField] private Vector3 normalScale = Vector3.one;
+    [SerializeField]
+    private Vector3 startScale =
+        new Vector3(0.05f, 0.05f, 0.05f);
 
-    [SerializeField, Min(0.01f)] private float growDuration = 0.08f;
-    [SerializeField, Min(0.01f)] private float shrinkDuration = 0.12f;
+    [SerializeField]
+    private Vector3 punchScale =
+        new Vector3(1.35f, 1.35f, 1.35f);
+
+    [SerializeField]
+    private Vector3 normalScale =
+        Vector3.one;
+
+    [SerializeField, Min(0.01f)]
+    private float growDuration = 0.08f;
+
+    [SerializeField, Min(0.01f)]
+    private float shrinkDuration = 0.12f;
 
     [Header("Billboard")]
-    [SerializeField] private bool faceCamera = true;
+    [SerializeField]
+    private bool faceCamera = true;
 
     private Coroutine scaleCoroutine;
     private Camera mainCamera;
@@ -25,47 +39,67 @@ public class ComboEffect : MonoBehaviour
     private void Awake()
     {
         if (comboText == null)
-            comboText = GetComponentInChildren<TMP_Text>();
+        {
+            comboText =
+                GetComponentInChildren<TMP_Text>(true);
+        }
 
         mainCamera = Camera.main;
-        HideImmediately();
+
+        HideComboText();
     }
 
     private void LateUpdate()
     {
         if (!faceCamera ||
-            !gameObject.activeSelf ||
+            comboText == null ||
+            !comboText.enabled ||
             mainCamera == null)
         {
             return;
         }
 
-        transform.rotation = Quaternion.LookRotation(
-            transform.position -
-            mainCamera.transform.position);
+        transform.rotation =
+            Quaternion.LookRotation(
+                transform.position -
+                mainCamera.transform.position);
     }
 
     public void ShowCombo(int combo)
     {
         if (combo <= 0)
         {
-            HideImmediately();
+            ResetCombo();
             return;
         }
 
         if (comboText == null)
         {
-            Debug.LogError("Combo3DText: TMP_Text belum diisi.");
+            Debug.LogError(
+                "ComboEffect: Combo Text belum diisi.");
+
             return;
         }
 
-        comboText.text = string.Format(comboFormat, combo);
-        gameObject.SetActive(true);
+        /*
+         * GameObject ComboEffect harus tetap aktif.
+         * Yang ditampilkan hanya komponen text-nya.
+         */
+        comboText.enabled = true;
+
+        comboText.text =
+            string.Format(
+                comboFormat,
+                combo);
 
         if (scaleCoroutine != null)
+        {
             StopCoroutine(scaleCoroutine);
+        }
 
-        scaleCoroutine = StartCoroutine(PlayPulse());
+        scaleCoroutine =
+            StartCoroutine(
+                PlayPulseAnimation());
     }
 
     public void ResetCombo()
@@ -76,46 +110,68 @@ public class ComboEffect : MonoBehaviour
             scaleCoroutine = null;
         }
 
-        HideImmediately();
+        HideComboText();
     }
 
-    private IEnumerator PlayPulse()
+    private IEnumerator PlayPulseAnimation()
     {
         transform.localScale = startScale;
 
-        yield return ScaleTo(punchScale, growDuration);
-        yield return ScaleTo(normalScale, shrinkDuration);
+        yield return AnimateScale(
+            startScale,
+            punchScale,
+            growDuration);
+
+        yield return AnimateScale(
+            punchScale,
+            normalScale,
+            shrinkDuration);
 
         transform.localScale = normalScale;
         scaleCoroutine = null;
     }
 
-    private IEnumerator ScaleTo(Vector3 targetScale, float duration)
+    private IEnumerator AnimateScale(
+        Vector3 from,
+        Vector3 to,
+        float duration)
     {
-        Vector3 initialScale = transform.localScale;
         float elapsed = 0f;
+
+        transform.localScale = from;
 
         while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
 
-            float t = Mathf.Clamp01(elapsed / duration);
-            t = t * t * (3f - 2f * t);
+            float progress =
+                Mathf.Clamp01(
+                    elapsed / duration);
 
-            transform.localScale = Vector3.Lerp(
-                initialScale,
-                targetScale,
-                t);
+            progress =
+                progress *
+                progress *
+                (3f - 2f * progress);
+
+            transform.localScale =
+                Vector3.Lerp(
+                    from,
+                    to,
+                    progress);
 
             yield return null;
         }
 
-        transform.localScale = targetScale;
+        transform.localScale = to;
     }
 
-    private void HideImmediately()
+    private void HideComboText()
     {
-        transform.localScale = startScale;
-        gameObject.SetActive(false);
+        transform.localScale = normalScale;
+
+        if (comboText != null)
+        {
+            comboText.enabled = false;
+        }
     }
 }

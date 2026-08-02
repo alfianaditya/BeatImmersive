@@ -19,41 +19,84 @@ public class NoteSpawner : MonoBehaviour
     [Header("Forward Targets")]
     [FormerlySerializedAs("leftAHit")]
     [SerializeField] private Transform leftAForwardTarget;
-
     [FormerlySerializedAs("leftBHit")]
     [SerializeField] private Transform leftBForwardTarget;
-
     [FormerlySerializedAs("rightAHit")]
     [SerializeField] private Transform rightAForwardTarget;
-
     [FormerlySerializedAs("rightBHit")]
     [SerializeField] private Transform rightBForwardTarget;
 
     [Header("Spawn Settings")]
-    [SerializeField] private float spawnInterval = 0.8f;
-
-    [Range(0f, 1f)]
-    [SerializeField] private float doubleChance = 0.3f;
-
-    [Range(0f, 1f)]
-    [SerializeField] private float crossChance = 0.15f;
+    [SerializeField, Min(0.05f)] private float spawnInterval = 0.8f;
+    [SerializeField, Range(0f, 1f)] private float doubleChance = 0.3f;
+    [SerializeField, Range(0f, 1f)] private float crossChance = 0.15f;
+    [SerializeField] private bool spawnImmediately;
 
     private float timer;
+    private bool isSpawning;
+
+    public bool IsSpawning => isSpawning;
 
     private void Start()
     {
         ValidateReferences();
+        StopSpawning();
     }
 
     private void Update()
     {
+        if (!isSpawning)
+            return;
+
         timer += Time.deltaTime;
 
         if (timer < spawnInterval)
             return;
 
         timer = 0f;
+        SpawnNext();
+    }
 
+    public void ConfigureFromSong(SongDataSO song)
+    {
+        if (song == null)
+            return;
+
+        spawnInterval = Mathf.Max(0.05f, song.SpawnInterval);
+        doubleChance = song.DoubleChance;
+        crossChance = song.CrossChance;
+    }
+
+    public void StartSpawning()
+    {
+        timer = 0f;
+        isSpawning = true;
+
+        if (spawnImmediately)
+            SpawnNext();
+    }
+
+    public void StopSpawning()
+    {
+        isSpawning = false;
+        timer = 0f;
+    }
+
+    public void ClearAllNotes()
+    {
+        Note[] notes = FindObjectsByType<Note>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        foreach (Note note in notes)
+        {
+            if (note != null)
+                Destroy(note.gameObject);
+        }
+    }
+
+    private void SpawnNext()
+    {
         if (Random.value < doubleChance)
             SpawnDouble();
         else
@@ -77,9 +120,7 @@ public class NoteSpawner : MonoBehaviour
                     : HandType.Left;
         }
 
-        GestureType gesture =
-            (GestureType)Random.Range(0, 3);
-
+        GestureType gesture = (GestureType)Random.Range(0, 3);
         Spawn(lane, requiredHand, gesture);
     }
 
@@ -87,11 +128,8 @@ public class NoteSpawner : MonoBehaviour
     {
         bool useA = Random.value < 0.5f;
 
-        LaneType leftLane =
-            useA ? LaneType.LeftA : LaneType.LeftB;
-
-        LaneType rightLane =
-            useA ? LaneType.RightA : LaneType.RightB;
+        LaneType leftLane = useA ? LaneType.LeftA : LaneType.LeftB;
+        LaneType rightLane = useA ? LaneType.RightA : LaneType.RightB;
 
         Spawn(
             leftLane,
@@ -119,7 +157,7 @@ public class NoteSpawner : MonoBehaviour
             forwardTarget == null)
         {
             Debug.LogError(
-                $"Gagal spawn note pada lane {lane}. Reference belum lengkap.");
+                $"NoteSpawner: Reference lane {lane} belum lengkap.");
             return;
         }
 
