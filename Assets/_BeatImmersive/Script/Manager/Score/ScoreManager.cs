@@ -1,190 +1,80 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
 {
-    [Header("Systems")]
-    [SerializeField] private RhythmMusicManager musicManager;
-    [SerializeField] private BeatmapSpawner beatmapSpawner;
-
-    [Header("Gameplay UI")]
-    [SerializeField] private TMP_Text timerText;
+    [Header("UI")]
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text missText;
 
-    [Header("Game Over")]
-    [SerializeField] private GameObject congratPanel;
-    [SerializeField] private TMP_Text finalScoreText;
-    [SerializeField] private TMP_Text finalMissText;
-    [SerializeField] private TMP_Text resultText;
-    [SerializeField] private Button restartButton;
+    [Header("3D Combo")]
+    [SerializeField] private ComboEffect comboEffect;
 
-    [Header("Result Messages")]
-    [TextArea]
-    [SerializeField]
-    private string winMessage =
-        "Selamat! Permainanmu sangat bagus!";
-
-    [TextArea]
-    [SerializeField]
-    private string encouragementMessage =
-        "Tetap semangat! Coba lagi dan kalahkan skor sebelumnya!";
+    [Header("Score Settings")]
+    [SerializeField, Min(0)] private int defaultHitScore = 100;
 
     public int Score { get; private set; }
     public int HitCount { get; private set; }
     public int MissCount { get; private set; }
-    public bool IsGameOver { get; private set; }
+    public int Combo { get; private set; }
+    public int MaxCombo { get; private set; }
 
     private void Start()
     {
-        Time.timeScale = 1f;
-
-        Score = 0;
-        HitCount = 0;
-        MissCount = 0;
-        IsGameOver = false;
-
-        if (congratPanel != null)
-            congratPanel.SetActive(false);
-
-        if (restartButton != null)
-            restartButton.onClick.AddListener(RestartGame);
-
-        RefreshGameplayUI();
-
-        if (musicManager != null)
-            RefreshTimer(musicManager.SongLengthSeconds);
-    }
-
-    private void Update()
-    {
-        if (IsGameOver || musicManager == null)
-            return;
-
-        RefreshTimer(musicManager.RemainingTimeSeconds);
-
-        if (musicManager.HasSongEnded)
-            EndGame();
+        ResetScore();
     }
 
     public void RegisterHit(int value)
     {
-        if (IsGameOver)
-            return;
+        int addedScore =
+            value > 0
+                ? value
+                : defaultHitScore;
 
-        Score += Mathf.Max(0, value);
+        Score += addedScore;
         HitCount++;
+        Combo++;
 
-        RefreshGameplayUI();
+        if (Combo > MaxCombo)
+            MaxCombo = Combo;
+
+        if (comboEffect != null)
+            comboEffect.ShowCombo(Combo);
+
+        RefreshUI();
     }
 
     public void RegisterMiss()
     {
-        if (IsGameOver)
-            return;
-
         MissCount++;
+        Combo = 0;
 
-        RefreshGameplayUI();
+        if (comboEffect != null)
+            comboEffect.ResetCombo();
+
+        RefreshUI();
     }
 
-    public void EndGame()
+    public void ResetScore()
     {
-        if (IsGameOver)
-            return;
+        Score = 0;
+        HitCount = 0;
+        MissCount = 0;
+        Combo = 0;
+        MaxCombo = 0;
 
-        IsGameOver = true;
+        if (comboEffect != null)
+            comboEffect.ResetCombo();
 
-        // Jangan memakai Time.timeScale = 0.
-        // MediaPipe dan pinch restart harus tetap berjalan.
-        if (beatmapSpawner != null)
-            beatmapSpawner.enabled = false;
-
-        DestroyRemainingNotes();
-
-        if (musicManager != null)
-            musicManager.StopSong();
-
-        RefreshTimer(0f);
-        ShowResult();
+        RefreshUI();
     }
 
-    private void ShowResult()
-    {
-        if (finalScoreText != null)
-            finalScoreText.text = $"Score: {Score}";
-
-        if (finalMissText != null)
-            finalMissText.text = $"Miss: {MissCount}";
-
-        if (resultText != null)
-        {
-            // Perbandingan memakai jumlah HIT dan MISS,
-            // bukan poin score yang nilainya 100 per hit.
-            resultText.text =
-                HitCount > MissCount
-                    ? winMessage
-                    : encouragementMessage;
-        }
-
-        if (congratPanel != null)
-            congratPanel.SetActive(true);
-    }
-
-    private void DestroyRemainingNotes()
-    {
-        Note[] remainingNotes =
-            FindObjectsByType<Note>(
-                FindObjectsSortMode.None);
-
-        foreach (Note note in remainingNotes)
-        {
-            if (note != null)
-                Destroy(note.gameObject);
-        }
-    }
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1f;
-
-        Scene currentScene =
-            SceneManager.GetActiveScene();
-
-        SceneManager.LoadScene(
-            currentScene.buildIndex);
-    }
-
-    private void RefreshGameplayUI()
+    private void RefreshUI()
     {
         if (scoreText != null)
             scoreText.text = $"Score: {Score}";
 
         if (missText != null)
             missText.text = $"Miss: {MissCount}";
-    }
-
-    private void RefreshTimer(float remainingSeconds)
-    {
-        if (timerText == null)
-            return;
-
-        int totalSeconds =
-            Mathf.CeilToInt(
-                Mathf.Max(0f, remainingSeconds));
-
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-
-        timerText.text =
-            $"{minutes:00}:{seconds:00}";
-    }
-
-    private void OnDestroy()
-    {
-        if (restartButton != null)
-            restartButton.onClick.RemoveListener(RestartGame);
     }
 }

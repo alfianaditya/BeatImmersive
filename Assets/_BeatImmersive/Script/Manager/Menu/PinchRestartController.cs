@@ -34,13 +34,13 @@ public class PinchRestartController : MonoBehaviour
             return;
         }
 
-        if (!scoreManager.IsGameOver)
-        {
-            wasGameOver = false;
-            waitingForRelease = false;
-            pinchHoldTimer = 0f;
-            return;
-        }
+        // if (!scoreManager.IsGameOver)
+        // {
+        //     wasGameOver = false;
+        //     waitingForRelease = false;
+        //     pinchHoldTimer = 0f;
+        //     return;
+        // }
 
         if (!wasGameOver)
         {
@@ -77,8 +77,8 @@ public class PinchRestartController : MonoBehaviour
 
         pinchHoldTimer += Time.unscaledDeltaTime;
 
-        if (pinchHoldTimer >= holdDuration)
-            scoreManager.RestartGame();
+        // if (pinchHoldTimer >= holdDuration)
+        //     // scoreManager.RestartGame();
     }
 
     private bool IsPinching(HandData hand)
