@@ -231,9 +231,10 @@ MonoBehaviour:
   rightColor: {r: 1, g: 0.041236367, b: 0, a: 1}
   speed: 10
   forwardTargetDistance: 0.05
-  scoreValue: 100
+  scoreValue: 10
   showHitLog: 0
   isResolved: 0
+  hasEnteredHitArea: 0
   <CanHit>k__BackingField: 0
   <IsHit>k__BackingField: 0
 --- !u!54 &3750269071947707431
