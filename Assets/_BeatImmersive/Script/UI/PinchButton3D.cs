@@ -68,10 +68,6 @@ public class PinchButton3D : MonoBehaviour
         isPressed = false;
         pressCoroutine = null;
 
-        /*
-         * Action dipanggil paling akhir.
-         * Jadi tombol boleh menjadi nonaktif setelah event dijalankan.
-         */
         onPinch?.Invoke();
     }
 

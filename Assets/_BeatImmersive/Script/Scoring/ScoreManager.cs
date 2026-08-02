@@ -25,13 +25,11 @@ public class ScoreManager : MonoBehaviour
         ResetScore();
     }
 
-    // Dipanggil jika HIT tidak memberikan nilai khusus.
     public void RegisterHit()
     {
         RegisterHit(defaultHitScore);
     }
 
-    // Dipanggil saat note berhasil dipukul.
     public void RegisterHit(int value)
     {
         int addedScore =
@@ -61,7 +59,6 @@ public class ScoreManager : MonoBehaviour
         RefreshUI();
     }
 
-    // Dipanggil saat note terlewat atau salah gesture.
     public void RegisterMiss()
     {
         MissCount++;
@@ -75,7 +72,6 @@ public class ScoreManager : MonoBehaviour
         RefreshUI();
     }
 
-    // Dipanggil saat mulai lagu, restart, atau memilih lagu baru.
     public void ResetScore()
     {
         Score = 0;

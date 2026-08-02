@@ -81,10 +81,6 @@ public class ComboEffect : MonoBehaviour
             return;
         }
 
-        /*
-         * GameObject ComboEffect harus tetap aktif.
-         * Yang ditampilkan hanya komponen text-nya.
-         */
         comboText.enabled = true;
 
         comboText.text =

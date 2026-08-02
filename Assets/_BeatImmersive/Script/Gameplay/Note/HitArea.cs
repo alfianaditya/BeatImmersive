@@ -77,7 +77,7 @@ public class HitArea : MonoBehaviour
 
         if (showAreaLog)
         {
-            Debug.LogError(
+            Debug.Log(
                 $"EXIT HIT AREA | Note: {note.name} | Lane: {lane}");
         }
     }

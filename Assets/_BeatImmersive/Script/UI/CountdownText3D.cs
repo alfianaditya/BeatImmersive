@@ -124,10 +124,6 @@ public class CountdownText3D : MonoBehaviour
                 normalScale,
                 settleDuration);
 
-            /*
-             * Gameplay, musik, dan note mulai
-             * ketika tulisan GO sudah tampil.
-             */
             if (label == "GO!!!")
             {
                 onGoShown?.Invoke();
@@ -141,10 +137,6 @@ public class CountdownText3D : MonoBehaviour
 
             countdownText.enabled = false;
 
-            /*
-             * Beri jeda satu frame sebelum
-             * angka berikutnya ditampilkan.
-             */
             yield return null;
 
             countdownText.enabled = true;

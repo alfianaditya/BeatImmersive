@@ -7,10 +7,6 @@ public class HitFeedbackManager : MonoBehaviour
 {
     public static HitFeedbackManager Instance { get; private set; }
 
-    // =========================================================
-    // TEXT PREFAB
-    // =========================================================
-
     [Header("Feedback Text Prefab")]
     [Tooltip("Prefab tulisan HIT yang muncul saat note berhasil.")]
     [SerializeField]
@@ -33,10 +29,6 @@ public class HitFeedbackManager : MonoBehaviour
     [SerializeField]
     private bool textFacesCamera = true;
 
-    // =========================================================
-    // AUDIO
-    // =========================================================
-
     [Header("Audio")]
     [SerializeField]
     private AudioSource audioSource;
@@ -49,11 +41,6 @@ public class HitFeedbackManager : MonoBehaviour
     [SerializeField]
     private float hitSoundVolume = 1f;
 
-
-    // =========================================================
-    // PARTICLE
-    // =========================================================
-
     [Header("Hit Particle")]
     [Tooltip(
         "Gunakan particle prefab berwarna putih agar dapat mengikuti warna note.")]
@@ -63,10 +50,6 @@ public class HitFeedbackManager : MonoBehaviour
     [Tooltip("Offset particle dari titik efek lane.")]
     [SerializeField]
     private Vector3 particlePositionOffset = Vector3.zero;
-
-    // =========================================================
-    // ENVIRONMENT
-    // =========================================================
 
     [Header("Lane Environment")]
     [Tooltip(
@@ -89,10 +72,6 @@ public class HitFeedbackManager : MonoBehaviour
 
     private readonly Dictionary<LaneType, LaneEnvironmentData>
         laneLookup = new();
-
-    // =========================================================
-    // UNITY
-    // =========================================================
 
     private void Awake()
     {
@@ -155,18 +134,9 @@ public class HitFeedbackManager : MonoBehaviour
         if (data.environmentRenderer == null)
             return;
 
-        /*
-         * Membuat material instance khusus untuk environment tersebut.
-         * Object lain yang menggunakan material sumber yang sama
-         * tidak akan ikut berubah warna.
-         */
         data.runtimeMaterial =
             data.environmentRenderer.material;
     }
-
-    // =========================================================
-    // HIT FEEDBACK
-    // =========================================================
 
     public void PlayHitFeedback(
     LaneType lane,
@@ -200,10 +170,6 @@ public class HitFeedbackManager : MonoBehaviour
         }
     }
 
-    // =========================================================
-    // MISS FEEDBACK
-    // =========================================================
-
     public void PlayMissFeedback(
         LaneType lane,
         Vector3 noteWorldPosition)
@@ -217,10 +183,6 @@ public class HitFeedbackManager : MonoBehaviour
             missTextPrefab,
             effectPosition);
     }
-
-    // =========================================================
-    // EFFECT POSITION
-    // =========================================================
 
     private Vector3 GetEffectPosition(
         LaneType lane,
@@ -238,8 +200,6 @@ public class HitFeedbackManager : MonoBehaviour
             }
         }
 
-        // Jika Effect Spawn Point belum diisi,
-        // gunakan posisi note.
         return fallbackPosition;
     }
 
@@ -276,10 +236,6 @@ public class HitFeedbackManager : MonoBehaviour
             textLifetime);
     }
 
-    // =========================================================
-    // AUDIO
-    // =========================================================
-
     private void PlaySound(
         AudioClip clip,
         float volume)
@@ -291,10 +247,6 @@ public class HitFeedbackManager : MonoBehaviour
             clip,
             volume);
     }
-
-    // =========================================================
-    // PARTICLE
-    // =========================================================
 
     private void SpawnHitParticle(
         Vector3 effectPosition,
@@ -327,10 +279,6 @@ public class HitFeedbackManager : MonoBehaviour
             particle.gameObject,
             Mathf.Max(0.1f, destroyDelay));
     }
-
-    // =========================================================
-    // ENVIRONMENT COLOR
-    // =========================================================
 
     private void FlashEnvironment(
         LaneEnvironmentData environmentData,
@@ -391,10 +339,6 @@ public class HitFeedbackManager : MonoBehaviour
             }
         }
 
-        /*
-         * Light bersifat opsional.
-         * Jika environment memiliki Light, warnanya ikut berubah.
-         */
         if (environmentData.environmentLight != null)
         {
             environmentData.environmentLight.color =
@@ -416,7 +360,7 @@ public class HitFeedbackManager : MonoBehaviour
                 "_BaseColor",
                 targetColor);
         }
-        // Standard Shader atau shader lain.
+
         else if (material.HasProperty("_Color"))
         {
             material.SetColor(
@@ -424,7 +368,6 @@ public class HitFeedbackManager : MonoBehaviour
                 targetColor);
         }
 
-        // Emission bersifat opsional.
         if (material.HasProperty("_EmissionColor"))
         {
             if (emissionIntensity > 0f)
@@ -444,10 +387,6 @@ public class HitFeedbackManager : MonoBehaviour
         }
     }
 }
-
-// =============================================================
-// DATA SETIAP LANE
-// =============================================================
 
 [Serializable]
 public class LaneEnvironmentData

@@ -24,7 +24,6 @@ public static class GestureDetector
     private const int PinkyDip = 19;
     private const int PinkyTip = 20;
 
-    // Semakin besar nilainya, jari harus semakin lurus agar dianggap terbuka.
     private const float PipAngleThreshold = 145f;
     private const float DipAngleThreshold = 145f;
     private const float DistanceMultiplier = 1.05f;
@@ -46,7 +45,6 @@ public static class GestureDetector
         bool pinkyOpen = IsFingerOpen(
             landmarks, PinkyMcp, PinkyPip, PinkyDip, PinkyTip);
 
-        // Scissors diperiksa lebih dahulu karena merupakan kombinasi khusus.
         if (indexOpen && middleOpen && !ringOpen && !pinkyOpen)
             return GestureType.Scissors;
 

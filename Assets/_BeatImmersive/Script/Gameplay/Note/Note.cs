@@ -162,7 +162,7 @@ public class Note : MonoBehaviour
 
         if (showHitLog)
         {
-            Debug.LogError(
+            Debug.Log(
                 $"HIT | Lane: {Lane} | " +
                 $"Hand: {RequiredHand} | " +
                 $"Gesture: {RequiredGesture}");
@@ -192,7 +192,7 @@ public class Note : MonoBehaviour
 
         if (showHitLog)
         {
-            Debug.LogError(
+            Debug.Log(
                 $"MISS | Lane: {Lane} | " +
                 $"Hand: {RequiredHand} | " +
                 $"Gesture: {RequiredGesture}");
