@@ -232,7 +232,7 @@ MonoBehaviour:
   speed: 10
   forwardTargetDistance: 0.05
   scoreValue: 100
-  showHitLog: 1
+  showHitLog: 0
   isResolved: 0
   <CanHit>k__BackingField: 0
   <IsHit>k__BackingField: 0

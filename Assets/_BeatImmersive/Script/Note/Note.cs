@@ -32,9 +32,11 @@ public class Note : MonoBehaviour
     public LaneType Lane { get; private set; }
     public HandType RequiredHand { get; private set; }
     public GestureType RequiredGesture { get; private set; }
+    public Color NoteColor { get; private set; } = Color.white;
 
     [Header("Runtime Debug")]
     [SerializeField] private bool isResolved;
+    [SerializeField] private bool hasEnteredHitArea;
 
     [field: SerializeField]
     public bool CanHit { get; private set; }
@@ -54,6 +56,7 @@ public class Note : MonoBehaviour
         CanHit = false;
         IsHit = false;
         isResolved = false;
+        hasEnteredHitArea = false;
     }
 
     public void SetMoveSpeed(float newSpeed)
@@ -93,15 +96,19 @@ public class Note : MonoBehaviour
         if (isResolved || areaLane != Lane)
             return;
 
+        hasEnteredHitArea = true;
         CanHit = true;
     }
 
     public void ExitHitArea(LaneType areaLane)
     {
-        if (areaLane != Lane)
+        if (isResolved || areaLane != Lane)
             return;
 
         CanHit = false;
+
+        if (hasEnteredHitArea)
+            Miss();
     }
 
     public void TryHitInsideArea(LaneType areaLane)
@@ -141,6 +148,18 @@ public class Note : MonoBehaviour
         if (scoreManager != null)
             scoreManager.RegisterHit(scoreValue);
 
+        Color actualNoteColor =
+        background != null
+        ? background.color
+        : NoteColor;
+        if (HitFeedbackManager.Instance != null)
+        {
+            HitFeedbackManager.Instance.PlayHitFeedback(
+                Lane,
+                NoteColor,
+                transform.position);
+        }
+
         if (showHitLog)
         {
             Debug.LogError(
@@ -163,6 +182,13 @@ public class Note : MonoBehaviour
 
         if (scoreManager != null)
             scoreManager.RegisterMiss();
+
+        if (HitFeedbackManager.Instance != null)
+        {
+            HitFeedbackManager.Instance.PlayMissFeedback(
+                Lane,
+                transform.position);
+        }
 
         if (showHitLog)
         {
@@ -190,6 +216,13 @@ public class Note : MonoBehaviour
                 hand == HandType.Left
                     ? leftColor
                     : rightColor;
+
+            // Simpan persis warna background note.
+            NoteColor = background.color;
+        }
+        else
+        {
+            NoteColor = Color.white;
         }
 
         if (icon == null)
