@@ -398,7 +398,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25126487}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5.5588303}
+  m_LocalPosition: {x: 0, y: 0, z: 168}
   m_LocalScale: {x: 4.3524156, y: 4.3524156, z: 4.3524156}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -406,7 +406,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.63950837, y: 114}
+  m_AnchoredPosition: {x: -0.63950837, y: 41}
   m_SizeDelta: {x: 45.2121, y: 5.6247}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &25126489
@@ -19446,7 +19446,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1251731882}
   m_LocalRotation: {x: 0, y: 0.42261827, z: 0, w: 0.9063079}
-  m_LocalPosition: {x: 0, y: 0, z: 192}
+  m_LocalPosition: {x: 0, y: 0, z: 172.00003}
   m_LocalScale: {x: 0.8881232, y: 1.1209891, z: 0.8881232}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -20399,11 +20399,11 @@ MonoBehaviour:
   pinchThreshold: 0.045
   releaseThreshold: 0.07
   mirrorX: 0
-  invertY: 0
+  invertY: 1
   buttonLayerMask:
     serializedVersion: 2
     m_Bits: 32
-  maxDistance: 100
+  maxDistance: 1000
 --- !u!1 &1324341128
 GameObject:
   m_ObjectHideFlags: 0
@@ -32172,7 +32172,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1994925193}
   m_LocalRotation: {x: 0, y: -0.42261827, z: 0, w: 0.9063079}
-  m_LocalPosition: {x: 0, y: 0, z: 188}
+  m_LocalPosition: {x: 0, y: 0, z: 168}
   m_LocalScale: {x: 0.8881232, y: 1.1209891, z: 0.8881232}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32363,7 +32363,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1999001460}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 167.00003}
+  m_LocalPosition: {x: 0, y: 0, z: 271}
   m_LocalScale: {x: 0.8881232, y: 1.1209891, z: 0.8881232}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -32372,7 +32372,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.0000019108, y: 98}
+  m_AnchoredPosition: {x: 4, y: -25}
   m_SizeDelta: {x: 296.54, y: 73.28}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1999001462
@@ -32440,7 +32440,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 5.5, y: 5.5, z: 5.5}
+  m_Size: {x: 295.42, y: 71, z: 5.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1999001465
 MonoBehaviour:

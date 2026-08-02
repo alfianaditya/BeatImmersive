@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SO_FeastTarot
   m_EditorClassIdentifier: 
   songTitle: Feast - Tarot
-  audioClip: {fileID: 8300000, guid: 37e88fa8508c7874c8fcbc2f86ef8dc3, type: 3}
+  audioClip: {fileID: 8300000, guid: 6377910ffee4290469b32b9d7f8e75db, type: 3}
   bpm: 115
   beatsPerSpawn: 1.5
   doubleChance: 0.2
