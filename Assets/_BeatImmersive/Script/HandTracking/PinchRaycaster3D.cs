@@ -98,30 +98,47 @@ public class PinchRaycaster3D : MonoBehaviour
                 ? 1f - normalizedPoint.y
                 : normalizedPoint.y;
 
+        x = Mathf.Clamp01(x);
+        y = Mathf.Clamp01(y);
+
+        Rect cameraRect =
+            interactionCamera.pixelRect;
+
         Vector3 screenPoint =
             new Vector3(
-                x * Screen.width,
-                y * Screen.height,
+                cameraRect.x + x * cameraRect.width,
+                cameraRect.y + y * cameraRect.height,
                 0f);
 
         Ray ray =
-            interactionCamera.ScreenPointToRay(screenPoint);
+            interactionCamera.ScreenPointToRay(
+                screenPoint);
 
-        if (!Physics.Raycast(
+        Debug.DrawRay(
+            ray.origin,
+            ray.direction * maxDistance,
+            Color.red,
+            0.5f);
+
+        RaycastHit[] hits =
+            Physics.RaycastAll(
                 ray,
-                out RaycastHit hit,
                 maxDistance,
                 buttonLayerMask,
-                QueryTriggerInteraction.Collide))
+                QueryTriggerInteraction.Collide);
+
+        foreach (RaycastHit hit in hits)
         {
+            PinchButton3D button =
+                hit.collider.GetComponentInParent<
+                    PinchButton3D>();
+
+            if (button == null)
+                continue;
+
+            button.Press();
             return;
         }
-
-        PinchButton3D button =
-            hit.collider.GetComponentInParent<PinchButton3D>();
-
-        if (button != null)
-            button.Press();
     }
 
     private void OnValidate()

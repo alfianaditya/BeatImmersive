@@ -33,13 +33,17 @@ public class RhythmMusicManager : MonoBehaviour
     {
         if (audioSource == null)
         {
-            Debug.LogError("RhythmMusicManager: AudioSource belum diisi.");
+            Debug.LogError(
+                "RhythmMusicManager: AudioSource belum diisi.");
+
             return false;
         }
 
         if (song == null || song.AudioClip == null)
         {
-            Debug.LogError("RhythmMusicManager: Song atau AudioClip kosong.");
+            Debug.LogError(
+                "RhythmMusicManager: Song atau AudioClip kosong.");
+
             return false;
         }
 
@@ -47,10 +51,12 @@ public class RhythmMusicManager : MonoBehaviour
 
         CurrentSong = song;
         CurrentBPM = song.BPM;
+
         audioSource.clip = song.AudioClip;
-        audioSource.time = 0f;
         audioSource.Play();
+
         IsScheduled = true;
+
         return true;
     }
 
@@ -59,7 +65,6 @@ public class RhythmMusicManager : MonoBehaviour
         if (audioSource != null)
         {
             audioSource.Stop();
-            audioSource.time = 0f;
         }
 
         IsScheduled = false;
